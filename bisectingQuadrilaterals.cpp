@@ -55,6 +55,8 @@ int main(int argc, char **argv)
 
     while(true)
     {
+        // TODO there may be blank lines between test cases
+
         fin >> points[0].x >> points[0].y;
 
         if(points[0].x == -1 && points[0].y == -1)
@@ -178,7 +180,7 @@ double bisect(double left, double right)
     // cout << "left area: " << leftArea << endl;
     // cout << "right area: " << rightArea << endl;
 
-    // TODO change to check if difference is small amount
+    // TODO change to check if difference is small amount (5th decimal place)
     if(leftArea > rightArea)
     {
         // bisect is in left half
