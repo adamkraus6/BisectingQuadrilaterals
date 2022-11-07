@@ -26,6 +26,10 @@ struct vec
 double bisect(double left, double right);
 Point intersect(Segment s1, Segment s2);
 double cross(vec a, vec b);
+double areaOf(Point ps[], int pn);
+void sortCW(Point ps[], int pn);
+bool compare(Point p1, Point p2, Point c);
+double getAngle(Point p, Point c);
 
 int main(int argc, char **argv)
 {
@@ -58,6 +62,7 @@ int main(int argc, char **argv)
 
         double left = points[0].x, right = left;
 
+        // calculate left and rightmost point for recursing
         for(int i = 1; i < 4; i++)
         {
             fin >> points[i].x >> points[i].y;
@@ -97,6 +102,7 @@ double bisect(double left, double right)
     segments[3].a = points[3];
     segments[3].b = points[0];
 
+    // make vertical line segment to bisect
     Point a, b;
     a.x = b.x = mid;
     a.y = 0;
@@ -105,25 +111,70 @@ double bisect(double left, double right)
     m.a = a;
     m.b = b;
 
+    // points making left and right halves of quad
+    Point l[8], r[8];
+    int ln = 0, rn = 0;
+
     // for each segment in quad
     for(int i = 0; i < 4; i++)
     {
         // check if intersect with vertical mid segment
         Point inter = intersect(m, segments[i]);
 
-        if(inter.x == 0 && inter.y == 0)
-        {
-            // no intersect
-        }
-        else
+        if(inter.x != 0 || inter.y != 0)
         {
             // intersect, put in some list
+            l[ln] = r[rn] = inter;
+            ln++;
+            rn++;
+        }
+    }
+
+    for(int i = 0; i < 4; i++)
+    {
+        // need to catch going through a vertex
+        if(points[i].x == mid)
+        {
+            l[ln] = r[rn] = points[i];
+            ln++;
+            rn++;
         }
 
-        // may need to catch going through a vertex
+        // add left points
+        if(points[i].x < mid)
+        {
+            l[ln] = points[i];
+            ln++;
+        }
+
+        // add right points
+        if(points[i].x > mid)
+        {
+            r[rn] = points[i];
+            rn++;
+        }
+    }
+
+    // need to sort points to be clockwise/counterclockwise
+    // sortCW(l, ln);
+    cout << "left points" << endl;
+    for(int i = 0; i < ln; i++)
+    {
+        cout << l[i].x << ' ' << l[i].y << endl;
+    }
+
+    // sortCW(r, rn);
+    cout << "right points" << endl;
+    for(int i = 0; i < rn; i++)
+    {
+        cout << r[i].x << ' ' << r[i].y << endl;
     }
 
     // calculate area on left and right side, inclusive of intersect points
+    double leftArea = areaOf(l, ln), rightArea = areaOf(r, rn);
+
+    cout << "left area: " << leftArea << endl;
+    cout << "right area: " << rightArea << endl;
 
     // if area difference < some small amount
         // return mid as bisecting point
@@ -186,7 +237,12 @@ Point intersect(Segment s1, Segment s2)
     // if both straddle, find intersection point
     if(st1 & st2)
     {
-        // TODO calculate intersect point
+        double tt = (a.x-c.x)*(c.y-d.y) - (a.y-c.y)*(c.x-d.x);
+        double tb = (a.x-b.x)*(c.y-d.y) - (a.y-b.y)*(c.x-d.x);
+        double t = tt/tb;
+
+        p.x = a.x + t*(b.x-a.x);
+        p.y = a.y + t*(b.y-a.y);
     }
 
     return p;
@@ -195,4 +251,78 @@ Point intersect(Segment s1, Segment s2)
 double cross(vec a, vec b)
 {
     return a.x * b.y - b.x * a.y;
+}
+
+double areaOf(Point ps[], int pn)
+{
+    double area = 0;
+
+    int j = pn - 1;
+    for(int i = 0; i < pn; i++)
+    {
+        area += (ps[j].x + ps[i].x) * (ps[j].y - ps[i].y);
+        j = i;
+    }
+
+    return abs(area / 2);
+}
+
+void sortCW(Point ps[], int pn)
+{
+    Point center;
+    center.x = center.y = 0;
+
+    for(int i = 0; i < pn; i++)
+    {
+        center.x += ps[i].x;
+        center.y += ps[i].y;
+    }
+
+    center.x /= pn;
+    center.y /= pn;
+
+    // cout << center.x << ' ' << center.y << endl;
+
+    for(int i = 0; i < pn; i++)
+    {
+        ps[i].x -= center.x;
+        ps[i].y -= center.y;
+    }
+
+    for(int i = 0; i < pn-1; i++)
+    {
+        for(int j = 0; j < pn-i-1; j++)
+        {
+            if(compare(ps[j], ps[j+1], center))
+            {
+                Point temp = ps[j];
+                ps[j] = ps[j+1];
+                ps[j+1] = temp;
+            }
+        }
+    }
+
+    for(int i = 0; i < pn; i++)
+    {
+        ps[i].x += center.x;
+        ps[i].y += center.y;
+    }
+}
+
+bool compare(Point p1, Point p2, Point c)
+{
+    double ang1 = getAngle(p1, c), ang2 = getAngle(p2, c);
+    if(ang1 < ang2)
+        return true;
+
+    return false;
+}
+
+double getAngle(Point p, Point c)
+{
+    double x = p.x - c.x, y = p.y - c.y;
+    double ang = atan2(y, x);
+    if(ang <= 0)
+        ang += 2*acos(0); // 2*PI
+    return ang;
 }
