@@ -8,6 +8,8 @@
 
 using namespace std;
 
+double PI = atan(1)*4;
+
 struct Point
 {
     double x, y;
@@ -156,32 +158,40 @@ double bisect(double left, double right)
     }
 
     // need to sort points to be clockwise/counterclockwise
-    // sortCW(l, ln);
-    cout << "left points" << endl;
-    for(int i = 0; i < ln; i++)
-    {
-        cout << l[i].x << ' ' << l[i].y << endl;
-    }
+    sortCW(l, ln);
+    // cout << "left points" << endl;
+    // for(int i = 0; i < ln; i++)
+    // {
+    //     cout << l[i].x << ' ' << l[i].y << endl;
+    // }
 
-    // sortCW(r, rn);
-    cout << "right points" << endl;
-    for(int i = 0; i < rn; i++)
-    {
-        cout << r[i].x << ' ' << r[i].y << endl;
-    }
+    sortCW(r, rn);
+    // cout << "right points" << endl;
+    // for(int i = 0; i < rn; i++)
+    // {
+    //     cout << r[i].x << ' ' << r[i].y << endl;
+    // }
 
     // calculate area on left and right side, inclusive of intersect points
     double leftArea = areaOf(l, ln), rightArea = areaOf(r, rn);
 
-    cout << "left area: " << leftArea << endl;
-    cout << "right area: " << rightArea << endl;
+    // cout << "left area: " << leftArea << endl;
+    // cout << "right area: " << rightArea << endl;
 
-    // if area difference < some small amount
-        // return mid as bisecting point
-    // else
-        // recurse on whichever side has bigger area
-    
-    return 0;
+    if(leftArea > rightArea)
+    {
+        // bisect is in left half
+        return bisect(left, mid);
+    }
+    else if(rightArea > leftArea)
+    {
+        // bisect is in right half
+        return bisect(mid, right);
+    }
+    else
+    {
+        return mid;
+    }
 }
 
 Point intersect(Segment s1, Segment s2)
@@ -281,8 +291,6 @@ void sortCW(Point ps[], int pn)
     center.x /= pn;
     center.y /= pn;
 
-    // cout << center.x << ' ' << center.y << endl;
-
     for(int i = 0; i < pn; i++)
     {
         ps[i].x -= center.x;
@@ -320,9 +328,8 @@ bool compare(Point p1, Point p2, Point c)
 
 double getAngle(Point p, Point c)
 {
-    double x = p.x - c.x, y = p.y - c.y;
-    double ang = atan2(y, x);
+    double ang = atan2(p.y, p.x);
     if(ang <= 0)
-        ang += 2*acos(0); // 2*PI
+        ang += 2*PI;
     return ang;
 }
