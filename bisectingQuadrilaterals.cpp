@@ -178,6 +178,7 @@ double bisect(double left, double right)
     // cout << "left area: " << leftArea << endl;
     // cout << "right area: " << rightArea << endl;
 
+    // TODO change to check if difference is small amount
     if(leftArea > rightArea)
     {
         // bisect is in left half
