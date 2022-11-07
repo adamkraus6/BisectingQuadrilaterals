@@ -8,8 +8,6 @@
 
 using namespace std;
 
-double PI = atan(1)*4;
-
 struct Point
 {
     double x, y;
@@ -17,7 +15,7 @@ struct Point
 
 struct Segment
 {
-    Point a, b;  
+    Point a, b;
 } segments[4];
 
 struct vec
@@ -39,27 +37,29 @@ int main(int argc, char **argv)
     ofstream fout("quad.out");
     int caseNum = 1;
 
-    if(!fin)
+    if (!fin)
     {
         cout << "Bad quad.in" << endl;
         fin.close();
-        return -1;
-    }
-
-    if(!fout)
-    {
-        cout << "Bad quad.out" << endl;
         fout.close();
         return -1;
     }
 
-    while(true)
+    if (!fout)
+    {
+        cout << "Bad quad.out" << endl;
+        fin.close();
+        fout.close();
+        return -1;
+    }
+
+    while (true)
     {
         // TODO there may be blank lines between test cases
 
         fin >> points[0].x >> points[0].y;
 
-        if(points[0].x == -1 && points[0].y == -1)
+        if (points[0].x == -1 && points[0].y == -1)
         {
             break;
         }
@@ -67,16 +67,16 @@ int main(int argc, char **argv)
         double left = points[0].x, right = left;
 
         // calculate left and rightmost point for recursing
-        for(int i = 1; i < 4; i++)
+        for (int i = 1; i < 4; i++)
         {
             fin >> points[i].x >> points[i].y;
 
-            if(points[i].x < left)
+            if (points[i].x < left)
             {
                 left = points[i].x;
             }
 
-            if(points[i].x > right)
+            if (points[i].x > right)
             {
                 right = points[i].x;
             }
@@ -91,6 +91,8 @@ int main(int argc, char **argv)
 
     fin.close();
     fout.close();
+
+    return 0;
 }
 
 double bisect(double left, double right)
@@ -98,10 +100,10 @@ double bisect(double left, double right)
     double mid = (left + right) / 2;
 
     // make line segments for quad
-    for(int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++)
     {
         segments[i].a = points[i];
-        segments[i].b = points[i+1];
+        segments[i].b = points[i + 1];
     }
     segments[3].a = points[3];
     segments[3].b = points[0];
@@ -120,12 +122,12 @@ double bisect(double left, double right)
     int ln = 0, rn = 0;
 
     // for each segment in quad
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         // check if intersect with vertical mid segment
         Point inter = intersect(m, segments[i]);
 
-        if(inter.x != 0 || inter.y != 0)
+        if (inter.x != 0 || inter.y != 0)
         {
             // intersect, put in some list
             l[ln] = r[rn] = inter;
@@ -134,10 +136,10 @@ double bisect(double left, double right)
         }
     }
 
-    for(int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         // need to catch going through a vertex
-        if(points[i].x == mid)
+        if (points[i].x == mid)
         {
             l[ln] = r[rn] = points[i];
             ln++;
@@ -145,14 +147,14 @@ double bisect(double left, double right)
         }
 
         // add left points
-        if(points[i].x < mid)
+        if (points[i].x < mid)
         {
             l[ln] = points[i];
             ln++;
         }
 
         // add right points
-        if(points[i].x > mid)
+        if (points[i].x > mid)
         {
             r[rn] = points[i];
             rn++;
@@ -181,12 +183,12 @@ double bisect(double left, double right)
     // cout << "right area: " << rightArea << endl;
 
     // TODO change to check if difference is small amount (5th decimal place)
-    if(leftArea > rightArea)
+    if (leftArea > rightArea)
     {
         // bisect is in left half
         return bisect(left, mid);
     }
-    else if(rightArea > leftArea)
+    else if (rightArea > leftArea)
     {
         // bisect is in right half
         return bisect(mid, right);
@@ -248,14 +250,14 @@ Point intersect(Segment s1, Segment s2)
     bool st2 = ((c3 < 0 && c4 > 0) || (c4 < 0 && c3 > 0)) ? true : false;
 
     // if both straddle, find intersection point
-    if(st1 & st2)
+    if (st1 & st2)
     {
-        double tt = (a.x-c.x)*(c.y-d.y) - (a.y-c.y)*(c.x-d.x);
-        double tb = (a.x-b.x)*(c.y-d.y) - (a.y-b.y)*(c.x-d.x);
-        double t = tt/tb;
+        double tt = (a.x - c.x) * (c.y - d.y) - (a.y - c.y) * (c.x - d.x);
+        double tb = (a.x - b.x) * (c.y - d.y) - (a.y - b.y) * (c.x - d.x);
+        double t = tt / tb;
 
-        p.x = a.x + t*(b.x-a.x);
-        p.y = a.y + t*(b.y-a.y);
+        p.x = a.x + t * (b.x - a.x);
+        p.y = a.y + t * (b.y - a.y);
     }
 
     return p;
@@ -271,7 +273,7 @@ double areaOf(Point ps[], int pn)
     double area = 0;
 
     int j = pn - 1;
-    for(int i = 0; i < pn; i++)
+    for (int i = 0; i < pn; i++)
     {
         area += (ps[j].x + ps[i].x) * (ps[j].y - ps[i].y);
         j = i;
@@ -285,7 +287,7 @@ void sortCW(Point ps[], int pn)
     Point center;
     center.x = center.y = 0;
 
-    for(int i = 0; i < pn; i++)
+    for (int i = 0; i < pn; i++)
     {
         center.x += ps[i].x;
         center.y += ps[i].y;
@@ -294,26 +296,26 @@ void sortCW(Point ps[], int pn)
     center.x /= pn;
     center.y /= pn;
 
-    for(int i = 0; i < pn; i++)
+    for (int i = 0; i < pn; i++)
     {
         ps[i].x -= center.x;
         ps[i].y -= center.y;
     }
 
-    for(int i = 0; i < pn-1; i++)
+    for (int i = 0; i < pn - 1; i++)
     {
-        for(int j = 0; j < pn-i-1; j++)
+        for (int j = 0; j < pn - i - 1; j++)
         {
-            if(compare(ps[j], ps[j+1], center))
+            if (compare(ps[j], ps[j + 1], center))
             {
                 Point temp = ps[j];
-                ps[j] = ps[j+1];
-                ps[j+1] = temp;
+                ps[j] = ps[j + 1];
+                ps[j + 1] = temp;
             }
         }
     }
 
-    for(int i = 0; i < pn; i++)
+    for (int i = 0; i < pn; i++)
     {
         ps[i].x += center.x;
         ps[i].y += center.y;
@@ -323,7 +325,7 @@ void sortCW(Point ps[], int pn)
 bool compare(Point p1, Point p2, Point c)
 {
     double ang1 = getAngle(p1, c), ang2 = getAngle(p2, c);
-    if(ang1 < ang2)
+    if (ang1 < ang2)
         return true;
 
     return false;
@@ -332,7 +334,7 @@ bool compare(Point p1, Point p2, Point c)
 double getAngle(Point p, Point c)
 {
     double ang = atan2(p.y, p.x);
-    if(ang <= 0)
-        ang += 2*PI;
+    if (ang <= 0)
+        ang += 2 * M_PI;
     return ang;
 }
