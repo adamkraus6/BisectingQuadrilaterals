@@ -8,6 +8,7 @@
 
 using namespace std;
 
+const double EPSILON = .000001;
 struct Point
 {
     double x, y;
@@ -55,7 +56,7 @@ int main(int argc, char **argv)
 
     while (true)
     {
-        // TODO there may be blank lines between test cases
+        // Will handle blank lines as is :)
 
         fin >> points[0].x >> points[0].y;
 
@@ -83,7 +84,9 @@ int main(int argc, char **argv)
         }
 
         double bi = bisect(left, right);
-        // TODO set precision and width stuff
+        // Think precision and width should be good
+        cout << setprecision(5) << fixed;
+        fout << setprecision(5) << fixed;
         fout << "Case " << caseNum << ": " << bi << endl;
         cout << "Case " << caseNum << ": " << bi << endl;
         caseNum++;
@@ -182,8 +185,11 @@ double bisect(double left, double right)
     // cout << "left area: " << leftArea << endl;
     // cout << "right area: " << rightArea << endl;
 
-    // TODO change to check if difference is small amount (5th decimal place)
-    if (leftArea > rightArea)
+    if (abs(leftArea - rightArea) <= EPSILON)
+    {
+        return mid;
+    }
+    else if (leftArea > rightArea)
     {
         // bisect is in left half
         return bisect(left, mid);
@@ -195,6 +201,7 @@ double bisect(double left, double right)
     }
     else
     {
+        cout << "Probably shouldn't be here, but returning mid" << endl;
         return mid;
     }
 }
