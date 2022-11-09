@@ -9,6 +9,7 @@
 using namespace std;
 
 const double EPSILON = .000001;
+
 struct Point
 {
     double x, y;
@@ -166,24 +167,10 @@ double bisect(double left, double right)
 
     // need to sort points to be clockwise/counterclockwise
     sortCW(l, ln);
-    // cout << "left points" << endl;
-    // for(int i = 0; i < ln; i++)
-    // {
-    //     cout << l[i].x << ' ' << l[i].y << endl;
-    // }
-
     sortCW(r, rn);
-    // cout << "right points" << endl;
-    // for(int i = 0; i < rn; i++)
-    // {
-    //     cout << r[i].x << ' ' << r[i].y << endl;
-    // }
 
     // calculate area on left and right side, inclusive of intersect points
     double leftArea = areaOf(l, ln), rightArea = areaOf(r, rn);
-
-    // cout << "left area: " << leftArea << endl;
-    // cout << "right area: " << rightArea << endl;
 
     if (abs(leftArea - rightArea) <= EPSILON)
     {
@@ -194,15 +181,10 @@ double bisect(double left, double right)
         // bisect is in left half
         return bisect(left, mid);
     }
-    else if (rightArea > leftArea)
+    else
     {
         // bisect is in right half
         return bisect(mid, right);
-    }
-    else
-    {
-        cout << "Probably shouldn't be here, but returning mid" << endl;
-        return mid;
     }
 }
 
