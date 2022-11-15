@@ -20,18 +20,21 @@ struct Segment
     Point a, b;
 } segments[4];
 
-struct vec
+struct Vec
 {
     double x, y;
 };
 
 double bisect(double left, double right);
 Point intersect(Segment s1, Segment s2);
-double cross(vec a, vec b);
+double cross(Vec a, Vec b);
 double areaOf(Point ps[], int pn);
 void sortCW(Point ps[], int pn);
 bool compare(Point p1, Point p2, Point c);
 double getAngle(Point p, Point c);
+Point makePoint(double x, double y);
+Segment makeSegment(Point a, Point b);
+Vec makeVec(Point a, Point b);
 
 int main(int argc, char **argv)
 {
@@ -113,13 +116,8 @@ double bisect(double left, double right)
     segments[3].b = points[0];
 
     // make vertical line segment to bisect
-    Point a, b;
-    a.x = b.x = mid;
-    a.y = 0;
-    b.y = 1000000;
-    Segment m;
-    m.a = a;
-    m.b = b;
+    Point a = makePoint(mid, 0), b = makePoint(mid, 1000000);
+    Segment m = makeSegment(a, b);
 
     // points making left and right halves of quad
     Point l[8], r[8];
@@ -188,54 +186,50 @@ double bisect(double left, double right)
     }
 }
 
-Point intersect(Segment s1, Segment s2)
+Point makePoint(double x, double y)
 {
     Point p;
-    p.x = 0;
-    p.y = 0;
+    p.x = x;
+    p.y = y;
+    return p;
+}
+
+Segment makeSegment(Point a, Point b)
+{
+    Segment s;
+    s.a = a;
+    s.b = b;
+    return s;
+}
+
+Vec makeVec(Point a, Point b)
+{
+    Vec v;
+    v.x = b.x - a.x;
+    v.y = b.y - a.y;
+    return v;
+}
+
+Point intersect(Segment s1, Segment s2)
+{
+    Point p = makePoint(0, 0);
 
     Point a = s1.a, b = s1.b, c = s2.a, d = s2.b;
 
     // get first straddle
-    // ab
-    vec ab;
-    ab.x = b.x - a.x;
-    ab.y = b.y - a.y;
-    // bc
-    vec bc;
-    bc.x = c.x - b.x;
-    bc.y = c.y - b.y;
-    // bd
-    vec bd;
-    bd.x = d.x - b.x;
-    bd.y = d.y - b.y;
-
-    // ab x bc
+    Vec ab = makeVec(a, b);
+    Vec bc = makeVec(b, c);
+    Vec bd = makeVec(b, d);
     double c1 = cross(ab, bc);
-    // ab x bd
     double c2 = cross(ab, bd);
-
     bool st1 = ((c1 < 0 && c2 > 0) || (c2 < 0 && c1 > 0)) ? true : false;
 
     // get second straddle
-    // cd
-    vec cd;
-    cd.x = d.x - c.x;
-    cd.y = d.y - c.y;
-    // da
-    vec da;
-    da.x = a.x - d.x;
-    da.y = a.y - d.y;
-    // db
-    vec db;
-    db.x = b.x - d.x;
-    db.y = b.y - d.y;
-
-    // cd x da
+    Vec cd = makeVec(c, d);
+    Vec da = makeVec(d, a);
+    Vec db = makeVec(d, b);
     double c3 = cross(cd, da);
-    // cd x db
     double c4 = cross(cd, db);
-
     bool st2 = ((c3 < 0 && c4 > 0) || (c4 < 0 && c3 > 0)) ? true : false;
 
     // if both straddle, find intersection point
@@ -252,7 +246,7 @@ Point intersect(Segment s1, Segment s2)
     return p;
 }
 
-double cross(vec a, vec b)
+double cross(Vec a, Vec b)
 {
     return a.x * b.y - b.x * a.y;
 }
@@ -273,8 +267,7 @@ double areaOf(Point ps[], int pn)
 
 void sortCW(Point ps[], int pn)
 {
-    Point center;
-    center.x = center.y = 0;
+    Point center = makePoint(0, 0);
 
     for (int i = 0; i < pn; i++)
     {
